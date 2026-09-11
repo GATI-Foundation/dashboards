@@ -1,0 +1,99 @@
+site_name: GATI Data Pipeline Documentation
+site_description: How GATI turns raw StepStone job postings into classified, dashboard-ready labour-market intelligence.
+site_author: GATI — Global Access to Talent from India
+docs_dir: docs
+
+theme:
+  name: material
+  logo: assets/gati-logo-white.svg
+  favicon: assets/gati-logo.svg
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  font:
+    text: Outfit
+    code: JetBrains Mono
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - toc.follow
+    - content.code.copy
+    - content.code.annotate
+    - search.suggest
+    - search.highlight
+
+extra_css:
+  - stylesheets/gati.css
+
+extra_javascript:
+  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
+  - javascripts/mermaid-init.js
+
+extra:
+  social:
+    - icon: material/web
+      link: https://draft-version-german-demand-dashboa.vercel.app/
+      name: Live Dashboard
+  generator: false
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - tables
+  - footnotes
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Overview:
+      - The Full Pipeline: overview/pipeline-overview.md
+      - Data Schema: overview/schema.md
+      - Tools & Accounts: overview/tools.md
+  - Stage 1 · Colab:
+      - Clean & Classify (ISCO-08): pipeline/stage1-colab.md
+  - Stage 2 · Kaggle:
+      - Translate & Reshape: pipeline/stage2-kaggle.md
+  - Stage 3 · Dashboard:
+      - Employer Sectors (ISIC): pipeline/stage3-jsx.md
+      - Deploy to Dashboard: pipeline/stage4-deploy.md
+  - Reference:
+      - Adding a New Sector: reference/new-sector.md
+      - Adding a New Country: reference/new-country.md
+      - Troubleshooting: reference/troubleshooting.md

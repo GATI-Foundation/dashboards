@@ -1,0 +1,184 @@
+/* ============================================================
+   GATI brand theme for MkDocs Material
+   ============================================================ */
+:root {
+  --gati-teal:      #0F5B5A;
+  --gati-teal2:     #1A7B7A;
+  --gati-teal-deep: #0B3B3A;
+  --gati-gold:      #C98A0B;
+  --gati-gold2:     #D4940A;
+  --gati-logo-teal: #006b76;
+  --gati-logo-gold: #e5a812;
+}
+
+/* Material colour hooks (primary = teal, accent = gold) */
+[data-md-color-primary="custom"] {
+  --md-primary-fg-color:        var(--gati-teal);
+  --md-primary-fg-color--light: var(--gati-teal2);
+  --md-primary-fg-color--dark:  var(--gati-teal-deep);
+  --md-primary-bg-color:        #ffffff;
+  --md-primary-bg-color--light: #ffffffcc;
+}
+[data-md-color-accent="custom"] {
+  --md-accent-fg-color:         var(--gati-gold2);
+  --md-accent-fg-color--transparent: #d4940a1a;
+}
+
+/* Links + code accents */
+.md-typeset a { color: var(--gati-teal2); }
+.md-typeset a:hover { color: var(--gati-gold2); }
+
+/* ---------- HERO (home page) ---------- */
+.gati-hero {
+  position: relative;
+  margin: -1.2rem -.8rem 2.4rem;
+  padding: 4.5rem 2rem 4rem;
+  border-radius: 0 0 20px 20px;
+  background: radial-gradient(circle at 50% 30%, #14595A 0%, #0F5B5A 45%, #0B3B3A 100%);
+  overflow: hidden;
+  text-align: center;
+  color: #fff;
+}
+.gati-hero::before {
+  content: "";
+  position: absolute;
+  top: -30%; left: 50%;
+  width: 640px; height: 640px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(242,193,78,.16) 0%, rgba(242,193,78,0) 62%);
+  animation: gatiAura 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes gatiAura {
+  0%,100% { transform: translateX(-50%) scale(.92); opacity:.6; }
+  50%     { transform: translateX(-50%) scale(1.08); opacity:1; }
+}
+.gati-hero__logo {
+  position: relative;
+  width: min(320px, 70vw);
+  height: auto;
+  filter: drop-shadow(0 6px 26px rgba(0,0,0,.35));
+  opacity: 0;
+  transform: translateY(18px) scale(.96);
+  -webkit-mask-image: linear-gradient(100deg,#000 40%,rgba(0,0,0,.15) 55%,#000 70%);
+          mask-image: linear-gradient(100deg,#000 40%,rgba(0,0,0,.15) 55%,#000 70%);
+  -webkit-mask-size: 260% 100%; mask-size: 260% 100%;
+  -webkit-mask-position: 120% 0; mask-position: 120% 0;
+  animation: gatiRise .9s .15s cubic-bezier(.2,.8,.25,1) forwards,
+             gatiWipe 1.5s .3s ease forwards;
+}
+@keyframes gatiRise { to { opacity:1; transform:none; } }
+@keyframes gatiWipe { to { -webkit-mask-position:-120% 0; mask-position:-120% 0; } }
+.gati-hero__tagline {
+  position: relative;
+  margin-top: 1.6rem;
+  font-size: 1.05rem;
+  font-weight: 400;
+  color: #CFE6E5;
+  max-width: 640px;
+  margin-left: auto; margin-right: auto;
+  line-height: 1.7;
+  opacity: 0;
+  animation: gatiFade .8s .6s forwards;
+}
+.gati-hero__sub {
+  position: relative;
+  display: inline-block;
+  margin-top: 1.4rem;
+  font-size: .72rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #9FC4C3;
+  opacity: 0;
+  animation: gatiFade .8s .9s forwards;
+}
+@keyframes gatiFade { to { opacity:1; } }
+
+/* Hero CTA buttons */
+.gati-hero__cta {
+  position: relative;
+  margin-top: 2rem;
+  display: flex;
+  gap: .8rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: gatiFade .8s 1.1s forwards;
+}
+.gati-hero__cta a {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .6rem 1.3rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: .9rem;
+  text-decoration: none;
+  transition: transform .15s, box-shadow .18s, background .18s;
+}
+.gati-hero__cta a.primary { background: var(--gati-gold2); color: #0B3B3A; }
+.gati-hero__cta a.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(242,193,78,.35); }
+.gati-hero__cta a.ghost { background: rgba(255,255,255,.1); color:#fff; border:1px solid rgba(255,255,255,.25); }
+.gati-hero__cta a.ghost:hover { background: rgba(255,255,255,.18); }
+
+/* ---------- stage cards on home ---------- */
+.gati-stages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+}
+.gati-stage {
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 12px;
+  padding: 1.2rem 1.3rem;
+  background: var(--md-default-bg-color);
+  transition: transform .15s, box-shadow .18s, border-color .18s;
+}
+.gati-stage:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(15,46,46,.1); border-color: var(--gati-teal2); }
+.gati-stage__num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 8px;
+  background: var(--gati-teal); color: #fff; font-weight: 700; font-size: .9rem;
+  margin-bottom: .7rem;
+}
+.gati-stage h3 { margin: 0 0 .3rem; font-size: 1.02rem; }
+.gati-stage p { margin: 0; font-size: .85rem; color: var(--md-default-fg-color--light); }
+.gati-stage .env {
+  display:inline-block; margin-top:.7rem; font-size:.7rem; font-weight:600;
+  padding:.15rem .5rem; border-radius:5px; letter-spacing:.5px;
+}
+.env.colab  { background:#F9AB0022; color:#C98A0B; }
+.env.kaggle { background:#20BEFF22; color:#137cbd; }
+.env.jsx    { background:#0F5B5A22; color:#0F5B5A; }
+[data-md-color-scheme="slate"] .env.jsx { color:#5fd0cf; }
+
+/* ---------- flow diagram ---------- */
+.gati-flow {
+  display:flex; align-items:stretch; gap:0; flex-wrap:wrap;
+  margin:1.5rem 0; border-radius:12px; overflow:hidden;
+  border:1px solid var(--md-default-fg-color--lightest);
+}
+.gati-flow__step {
+  flex:1 1 180px; padding:1rem 1.1rem; position:relative;
+  background:var(--md-default-bg-color);
+  border-right:1px solid var(--md-default-fg-color--lightest);
+}
+.gati-flow__step:last-child { border-right:none; }
+.gati-flow__step .lbl { font-size:.7rem; letter-spacing:1px; text-transform:uppercase; color:var(--gati-gold2); font-weight:700; }
+.gati-flow__step .file { font-family:'JetBrains Mono',monospace; font-size:.78rem; color:var(--md-default-fg-color--light); margin-top:.3rem; word-break:break-all; }
+.gati-flow__step h4 { margin:.4rem 0 .2rem; font-size:.92rem; }
+
+/* code block polish */
+.md-typeset .highlight > pre > code { font-size:.78rem; }
+
+/* nav tab accent */
+.md-tabs { background: var(--gati-teal-deep); }
+.md-header { background: var(--gati-teal); }
+
+/* admonition brand tint */
+.md-typeset .admonition.tip,
+.md-typeset details.tip { border-color: var(--gati-gold2); }
+.md-typeset .tip > .admonition-title,
+.md-typeset .tip > summary { background-color: #d4940a1a; }
