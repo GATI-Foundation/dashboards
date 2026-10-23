@@ -1,0 +1,23 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+
+# Node (in case npm is ever added)
+node_modules/
+package-lock.json
+
+# Temporary files
+*.tmp
+*.bak
+*.orig

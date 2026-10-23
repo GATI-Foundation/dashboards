@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GATI — Indian Global Mobility Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --teal:#006B76;
+  --teal-dark:#00333A;
+  --teal-light:#84D2E2;
+  --gold:#E5A812;
+  --gold-light:#FFCC4E;
+  --gold-dark:#8C6A1F;
+  --gray:#839097;
+  --gray-light:#D8E2E7;
+  --black:#000000;
+  --white:#FFFFFF;
+  --bg:#F6F9FA;
+  --card-border:#E1E9EB;
+  --font:'Poppins',sans-serif;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:var(--font);background:var(--bg);color:#1A2327;}
+h1,h2,h3{font-family:var(--font);margin:0;}
+p{margin:0;}
+a{color:inherit;}
+
+/* ---------- Site Header (white branding bar) ---------- */
+.site-header{
+  background:var(--white);
+  height:84px;
+  display:flex;
+  align-items:center;
+  padding:0 40px 0 32px;
+  gap:12px;
+  box-shadow:0 1px 4px rgba(0,0,0,.08);
+  position:relative;
+  z-index:10;
+}
+.site-header-logo{
+  height:70px;
+  width:auto;
+  display:block;
+  flex-shrink:0;
+}
+.site-header-title{
+  font-family:var(--font);
+  font-weight:700;
+  font-size:32px;
+  color:var(--teal);
+  letter-spacing:normal;
+  line-height:1.2;
+  white-space:nowrap;
+}
+
+/* ---------- Teal Hero ---------- */
+.topbar{
+  background:var(--teal);
+  color:var(--white);
+  padding:18px 40px 20px;
+}
+.topbar .subtitle{margin-top:0;font-size:14.5px;color:#CFE9EC;max-width:760px;line-height:1.5;}
+
+/* ---------- Tab nav ---------- */
+.section-nav{
+  display:flex;gap:0;background:var(--teal-dark);padding:0 40px;
+  font-size:13.5px;font-weight:600;
+}
+.tab-btn{
+  background:none;border:none;color:var(--teal-light);
+  padding:13px 22px;font-family:var(--font);font-size:13.5px;font-weight:600;
+  cursor:pointer;border-bottom:3px solid transparent;transition:all .15s ease;
+}
+.tab-btn:hover{color:var(--gold-light);}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);background:rgba(255,255,255,.05);}
+
+/* ---------- Tab panels ---------- */
+.tab-panel{display:none;padding:24px 40px 30px;}
+.tab-panel.active{display:block;}
+
+/* ---------- KPI strip ---------- */
+.kpi-strip{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;
+  margin-bottom:22px;
+}
+.kpi-card{
+  background:var(--white);border:1px solid var(--card-border);border-top:3px solid var(--gold);
+  border-radius:10px;padding:16px 18px;
+}
+.kpi-label{font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;}
+.kpi-value{font-size:26px;font-weight:800;color:var(--teal-dark);line-height:1.1;}
+.kpi-caption{font-size:11.5px;color:var(--gray);margin-top:6px;line-height:1.4;}
+
+/* ---------- Section head ---------- */
+.section-head{border-bottom:3px solid var(--gold);padding-bottom:12px;margin-bottom:18px;}
+.eyebrow{font-size:11.5px;font-weight:700;color:var(--gold-dark);text-transform:uppercase;letter-spacing:1px;}
+.section-head h2{font-size:22px;color:var(--teal);font-weight:700;margin-top:4px;}
+.section-head h2 .tag{
+  font-size:11.5px;background:var(--teal-light);color:var(--teal-dark);padding:3px 9px;
+  border-radius:12px;font-weight:700;vertical-align:middle;margin-left:8px;
+}
+.section-intro{font-size:13.8px;color:#3B4A50;max-width:920px;line-height:1.6;margin-top:8px;}
+
+/* ---------- Charts ---------- */
+.chart-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+.chart-card{
+  background:var(--white);border:1px solid var(--card-border);border-radius:10px;
+  padding:16px 18px 12px;display:flex;flex-direction:column;
+}
+.chart-card.wide{grid-column:1 / -1;}
+.chart-card h3{font-size:14.5px;font-weight:700;color:var(--teal-dark);}
+.chart-note{font-size:12px;color:var(--gray);margin-top:5px;margin-bottom:10px;line-height:1.5;min-height:20px;}
+.chart-canvas-wrap{position:relative;height:290px;}
+
+/* ---------- Per-chart filters ---------- */
+.chart-filter-row{
+  display:flex;flex-wrap:wrap;align-items:center;gap:4px;
+  margin:8px 0 2px;padding:6px 0 4px;border-top:1px dashed var(--card-border);
+}
+.chart-pill{
+  font-size:10.5px;font-family:var(--font);padding:2px 9px;
+  border-radius:12px;border:1px solid var(--gray-light);
+  background:var(--white);color:#6B7A80;cursor:pointer;font-weight:600;
+  transition:all .12s ease;line-height:1.4;
+}
+.chart-pill.active{background:var(--teal);color:var(--white);border-color:var(--teal);}
+.chart-pill:hover{border-color:var(--teal-light);background:#F0F8F9;}
+.chart-pill.active:hover{background:#00828F;}
+.chart-year-sel{
+  font-size:11px;padding:2px 6px;border-radius:4px;
+  border:1px solid var(--card-border);font-family:var(--font);font-weight:600;
+  color:#1A2327;background:var(--white);margin-left:4px;
+}
+.filter-year-label{font-size:10px;color:var(--gray);font-weight:600;margin-left:8px;text-transform:uppercase;letter-spacing:.3px;}
+.filter-sep{font-size:10px;color:var(--gray);margin:0 2px;}
+
+/* ---------- Notes ---------- */
+.no-flow-note{
+  background:#FFF7E6;border:1px dashed var(--gold);border-radius:8px;padding:12px 16px;
+  font-size:12.5px;color:#5C4300;line-height:1.5;margin-top:14px;
+}
+.data-notes{
+  background:var(--white);border-radius:10px;border:1px solid var(--card-border);
+  padding:30px 40px;max-width:960px;
+}
+.data-notes h2{color:var(--teal);font-size:20px;margin-bottom:16px;}
+.data-notes ul{margin:0;padding-left:20px;font-size:13.5px;line-height:1.75;color:#3B4A50;}
+.data-notes li{margin-bottom:10px;}
+.data-notes b{color:var(--teal-dark);}
+
+/* ---------- Footer ---------- */
+footer{background:var(--teal-dark);color:#9FC6CA;text-align:center;font-size:11.5px;padding:14px;}
+
+/* ---------- Country Nav Dropdown ---------- */
+.country-nav{position:relative;margin-left:auto;}
+.country-nav-btn{
+  background:var(--teal);color:var(--white);border:none;
+  padding:9px 20px;border-radius:8px;font-family:var(--font);
+  font-size:13px;font-weight:600;cursor:pointer;
+  transition:background .15s;display:flex;align-items:center;gap:6px;
+}
+.country-nav-btn:hover{background:#00828F;}
+.country-nav-btn::after{content:'▾';font-size:10px;margin-left:2px;}
+.country-nav-menu{
+  display:none;position:absolute;top:calc(100% + 8px);right:0;
+  background:var(--white);border-radius:10px;
+  box-shadow:0 8px 32px rgba(0,0,0,.14);min-width:220px;
+  padding:6px;z-index:100;border:1px solid var(--card-border);
+}
+.country-nav.open .country-nav-menu{display:block;}
+.country-nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  border-radius:8px;text-decoration:none;color:#1A2327;
+  font-size:13.5px;font-weight:500;font-family:var(--font);
+  transition:background .1s;
+}
+.country-nav-item:hover{background:#F0F8F9;}
+.country-nav-item.active{background:var(--teal);color:var(--white);}
+.country-flag{font-size:18px;line-height:1;}
+
+/* ---------- Data Notes — enriched content ---------- */
+.dn-intro{
+  font-size:14px;color:#3B4A50;line-height:1.7;max-width:860px;margin-bottom:24px;
+}
+.dn-section{
+  margin-bottom:28px;
+}
+.dn-section-title{
+  font-size:18px;font-weight:700;color:var(--teal);margin:0 0 14px;
+  padding:0 0 10px;border-bottom:2px solid var(--gold);display:flex;align-items:center;gap:8px;
+}
+.dn-section-title .dn-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;border-radius:50%;background:var(--teal);color:var(--white);
+  font-size:12px;font-weight:700;flex-shrink:0;
+}
+.dn-section-subtitle{
+  font-size:14.5px;font-weight:700;color:var(--teal-dark);margin:16px 0 8px;
+}
+.dn-text{
+  font-size:13.5px;color:#3B4A50;line-height:1.7;margin:0 0 12px;
+}
+.dn-text b,.dn-text strong{color:var(--teal-dark);}
+.dn-text em{color:var(--gray);font-style:italic;}
+.dn-grid-2col{
+  display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0;
+}
+.dn-card{
+  background:var(--white);border:1px solid var(--card-border);border-top:3px solid var(--teal-light);
+  border-radius:10px;padding:16px 18px;
+}
+.dn-card-title{
+  font-size:13.5px;font-weight:700;color:var(--teal);margin-bottom:6px;
+}
+.dn-card-text{
+  font-size:13px;color:#3B4A50;line-height:1.6;
+}
+.dn-note-callout{
+  background:#FFF7E6;border:1px dashed var(--gold);border-radius:8px;
+  padding:12px 16px;font-size:12.5px;color:#5C4300;line-height:1.6;margin:14px 0;
+}
+.dn-note-callout b{color:#8C6A1F;}
+.dn-method-list{
+  display:flex;flex-direction:column;gap:10px;margin:12px 0;
+}
+.dn-method-item{
+  background:var(--white);border:1px solid var(--card-border);
+  border-left:3px solid var(--teal);border-radius:8px;padding:14px 16px;font-size:13px;
+  color:#3B4A50;line-height:1.6;
+}
+.dn-method-item strong{color:var(--teal);}
+.dn-method-item em{color:var(--gray);}
+.dn-table{
+  width:100%;border-collapse:collapse;margin:14px 0;font-size:13px;
+  border:1px solid var(--card-border);border-radius:8px;overflow:hidden;
+}
+.dn-table th{
+  background:var(--teal);color:var(--white);font-weight:600;font-size:12px;
+  text-transform:uppercase;letter-spacing:.3px;padding:10px 14px;text-align:left;
+}
+.dn-table td{
+  padding:10px 14px;border-bottom:1px solid var(--card-border);color:#3B4A50;
+}
+.dn-table td strong{color:var(--teal-dark);}
+.dn-table tr:last-child td{border-bottom:none;}
+.dn-table tr:hover td{background:#F0F8F9;}
+.dn-label{
+  font-size:11px;font-weight:700;color:var(--gold-dark);text-transform:uppercase;
+  letter-spacing:.8px;margin:18px 0 8px;
+}
+.dn-links-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:8px 0 18px;
+}
+.dn-link-item{
+  background:var(--white);border:1px solid var(--card-border);padding:10px 14px;
+  border-radius:8px;font-size:13px;text-decoration:none;color:var(--teal-dark);
+  font-weight:500;display:flex;justify-content:space-between;align-items:center;
+  transition:all .15s ease;
+}
+.dn-link-item:hover{
+  border-color:var(--teal);background:#F0F8F9;color:var(--teal);
+  box-shadow:0 2px 8px rgba(0,107,118,.08);
+}
+.dn-link-item span{font-size:11px;color:var(--gray);}
+.dn-footer-note{
+  border-top:1px solid var(--card-border);padding-top:18px;margin-top:10px;
+  font-size:13px;color:var(--gray);line-height:1.6;
+}
+.dn-footer-note b{color:var(--teal-dark);}
+.dn-accordion{
+  background:var(--white);border:1px solid var(--card-border);border-radius:8px;
+  margin:10px 0;overflow:hidden;
+}
+.dn-accordion summary{
+  padding:12px 16px;font-size:13.5px;font-weight:600;color:var(--teal);
+  cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;
+  transition:background .12s;
+}
+.dn-accordion summary:hover{background:#F0F8F9;}
+.dn-accordion summary::before{
+  content:'▸';font-size:12px;color:var(--gold);transition:transform .2s;
+}
+.dn-accordion[open] summary::before{transform:rotate(90deg);}
+.dn-accordion .dn-accordion-body{
+  padding:0 16px 14px;border-top:1px solid var(--card-border);
+}
+
+@media (max-width:900px){
+  .chart-grid{grid-template-columns:1fr;}
+  .site-header{padding:0 18px 0 18px;gap:16px;height:68px;}
+  .site-header-logo{height:44px;}
+  .site-header-title{font-size:22px;}
+  .topbar,.section-nav,.tab-panel,footer{padding-left:18px;padding-right:18px;}
+  .data-notes{padding:20px;}
+  .country-nav-btn{font-size:11.5px;padding:7px 14px;}
+  .dn-grid-2col{grid-template-columns:1fr;}
+  .dn-table{font-size:12px;}
+  .dn-table th,.dn-table td{padding:8px 10px;}
+}
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <a href="index.html" style="display:flex; align-items:center; text-decoration:none;">
+    <img src="gati-logo.png" alt="GATI — Global Access to Talent from India" class="site-header-logo">
+  </a>
+  <span class="site-header-title">Indian Global Mobility Dashboard</span>
+  <div class="country-nav" id="countryNav">
+    <button class="country-nav-btn" onclick="this.parentElement.classList.toggle('open')">Country Profiles</button>
+    <div class="country-nav-menu">
+      <a href="index.html" class="country-nav-item active">
+        <span class="country-flag">🌐</span> Overview
+      </a>
+      <a href="japan.html" class="country-nav-item">
+        <span class="country-flag">🇯🇵</span> Japan
+      </a>
+      <a href="germany.html" class="country-nav-item">
+        <span class="country-flag">🇩🇪</span> Germany
+      </a>
+    </div>
+  </div>
+</div>
+
+<header class="topbar">
+  <p class="subtitle">Indian talent abroad, by country — population, employment and healthcare workforce, benchmarked against each country's total foreign-national numbers.</p>
+</header>
+
+<nav class="section-nav" id="sectionNav">
+  <button class="tab-btn active" data-tab="population">All-purpose migration</button>
+  <button class="tab-btn" data-tab="employment">Employment</button>
+  <button class="tab-btn" data-tab="healthcare">Healthcare</button>
+  <button class="tab-btn" data-tab="notes">Data Notes</button>
+</nav>
+
+<main>
+  <!-- ================= POPULATION TAB ================= -->
+  <div class="tab-panel active" id="tab-population">
+    <div class="section-head">
+      <span class="eyebrow">Section 01</span>
+      <h2>Indians Abroad <span class="tag">All purposes</span></h2>
+      <p class="section-intro">Indians abroad for any purpose — work, study, family, or otherwise — shown alongside all foreign nationals abroad in each destination country.</p>
+    </div>
+    <div class="kpi-strip">
+      <div class="kpi-card" id="kpi-pop-indian">
+        <div class="kpi-label">Number of Indians abroad, 2024 (stock)</div>
+        <div class="kpi-value">—</div>
+        <div class="kpi-caption">Loading…</div>
+      </div>
+      <div class="kpi-card" id="kpi-pop-foreign">
+        <div class="kpi-label">Number of all foreigners abroad, 2024 (stock)</div>
+        <div class="kpi-value">—</div>
+        <div class="kpi-caption">Loading…</div>
+      </div>
+      <div class="kpi-card" id="kpi-pop-share">
+        <div class="kpi-label">Share of Indians among all foreigners, 2024 (stock)</div>
+        <div class="kpi-value">—</div>
+        <div class="kpi-caption">Loading…</div>
+      </div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Indians abroad, by destination country (stock)</h3>
+        <div class="chart-filter-row" id="filters-pop-stock-trend"></div>
+        <p class="chart-note" id="note-pop-stock-trend"></p>
+        <div class="chart-canvas-wrap"><canvas id="chart-pop-stock-trend"></canvas></div>
+        <p class="chart-note" style="color:#8C6A1F;font-style:italic;margin-top:4px;">Note: stock reference dates differ by country.</p>
+      </div>
+      <div class="chart-card">
+        <h3>Share of Indians among all foreigners by destination country (stock)</h3>
+        <div class="chart-filter-row" id="filters-pop-share"></div>
+        <p class="chart-note" id="note-pop-share"></p>
+        <div class="chart-canvas-wrap"><canvas id="chart-pop-share"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Indians abroad, by destination country (flow), as per official national sources</h3>
+        <div class="chart-filter-row" id="filters-pop-flow-A-indian"></div>
+        <p class="chart-note" id="note-pop-flow-A-indian"></p>
+        <div class="chart-canvas-wrap"><canvas id="chart-pop-flow-A-indian"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>All foreigners abroad, by destination country (flow), as per official national sources</h3>
+        <div class="chart-filter-row" id="filters-pop-flow-A-foreign"></div>
+        <p class="chart-note" id="note-pop-flow-A-foreign"></p>
+        <div class="chart-canvas-wrap"><canvas id="chart-pop-flow-A-foreign"></canvas></div>
+      </div>
+      <p class="chart-note" style="color:#8C6A1F;font-style:italic;margin-top:2px;margin-bottom:12px;grid-column:1/-1;">Source: national statistical/immigration authorities (Destatis, ONS LTIM, Korea Immigration Service). Each covers all foreign nationalities, but methods differ by country — not directly comparable to each other or to the non-EU chart.</p>
+      <div class="chart-card">
+        <h3>Permits granted to Indians, as per Eurostat and Istat data</h3>
+        <div class="chart-filter-row" id="filters-pop-flow-B-indian"></div>
+        <p class="chart-note" id="note-pop-flow-B-indian"></p>
+        <div class="chart-canvas-wrap"><canvas id="chart-pop-flow-B-indian"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Permits granted to all foreigners, as per Eurostat and Istat data</h3>
+        <div class="chart-filter-row" id="filters-pop-flow-B-foreign"></div>
+        <p class="chart-note" id="note-pop-flow-B-foreign"></p>
+        <div class="chart-canvas-wrap"><canvas id="chart-pop-flow-B-foreign"></canvas></div>
+      </div>
+      <p class="chart-note" style="color:#8C6A1F;font-style:italic;margin-top:2px;margin-bottom:4px;grid-column:1/-1;">Source: Eurostat first-permit data (France, Poland, Spain) and ISTAT (Italy). All four use a non-EU comparator, excluding EU/EEA citizens — not the full foreign-resident population.</p>
+    </div>
+  </div>
+
+  <!-- ================= EMPLOYMENT TAB ================= -->
+  <div class="tab-panel" id="tab-employment">
+    <div class="section-head">
+      <span class="eyebrow">Section 02</span>
+      <h2>Indian Employment Abroad <span class="tag">Employment-specific</span></h2>
+      <p class="section-intro">Indians formally employed in each destination country, shown alongside total foreign workers there.</p>
+    </div>
+    <div class="kpi-strip">
+      <div class="kpi-card" id="kpi-emp-indian">
+        <div class="kpi-label">Number of Indian workers, 2024 (stock)</div>
+        <div class="kpi-value">—</div>
+        <div class="kpi-caption">Loading…</div>
+      </div>
+      <div class="kpi-card" id="kpi-emp-foreign">
+        <div class="kpi-label">Number of foreign workers, 2024 (stock)</div>
+        <div class="kpi-value">—</div>
+        <div class="kpi-caption">Loading…</div>
+      </div>
+      <div class="kpi-card" id="kpi-emp-share">
+        <div class="kpi-label">Share of Indian workers among foreign workers, 2024 (stock)</div>
+        <div class="kpi-value">—</div>
+        <div class="kpi-caption">Loading…</div>
+      </div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Indian workers abroad, by destination country (stock)</h3>
+        <div class="chart-filter-row" id="filters-emp-stock-trend"></div>
+        <p class="chart-note" id="note-emp-stock-trend"></p>
+        <div class="chart-canvas-wrap"><canvas id="chart-emp-stock-trend"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Share of Indian workers among foreign workers, by destination country (stock)</h3>
+        <div class="chart-filter-row" id="filters-emp-share"></div>
+        <p class="chart-note" id="note-emp-share"></p>
+        <div class="chart-canvas-wrap"><canvas id="chart-emp-share"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Indian workers abroad, by destination country (flow)</h3>
+        <div class="chart-filter-row" id="filters-emp-flow-indian"></div>
+        <p class="chart-note" id="note-emp-flow-indian"></p>
+        <div class="chart-canvas-wrap"><canvas id="chart-emp-flow-indian"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Foreign workers abroad, by destination country (flow)</h3>
+        <div class="chart-filter-row" id="filters-emp-flow-foreign"></div>
+        <p class="chart-note" id="note-emp-flow-foreign"></p>
+        <div class="chart-canvas-wrap"><canvas id="chart-emp-flow-foreign"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= HEALTHCARE TAB ================= -->
+  <div class="tab-panel" id="tab-healthcare">
+    <div class="section-head">
+      <span class="eyebrow">Section 03</span>
+      <h2>Indian Nurses Abroad <span class="tag">Healthcare — nurses (stock &amp; flow)</span></h2>
+      <p class="section-intro">Indian nurses working abroad — stock (point-in-time totals), annual inflow, growth, and India's share of total foreign nurses, benchmarked across countries.</p>
+    </div>
+    <div class="kpi-strip">
+      <div class="kpi-card" id="kpi-health-indian">
+        <div class="kpi-label">Number of Indian nurses abroad, 2024 (stock)</div>
+        <div class="kpi-value">—</div>
+        <div class="kpi-caption">Loading…</div>
+      </div>
+      <div class="kpi-card" id="kpi-health-foreign">
+        <div class="kpi-label">Number of foreign nurses abroad, 2024 (stock)</div>
+        <div class="kpi-value">—</div>
+        <div class="kpi-caption">Loading…</div>
+      </div>
+      <div class="kpi-card" id="kpi-health-share">
+        <div class="kpi-label">Share of Indian nurses among foreign nurses, 2024 (stock)</div>
+        <div class="kpi-value">—</div>
+        <div class="kpi-caption">Loading…</div>
+      </div>
+      <div class="kpi-card" id="kpi-health-growth">
+        <div class="kpi-label">Growth rate of Indian nurses abroad (stock)</div>
+        <div class="kpi-value">—</div>
+        <div class="kpi-caption">Loading…</div>
+      </div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Indian nurses abroad, by destination country (stock)</h3>
+        <div class="chart-filter-row" id="filters-health-stock-trend"></div>
+        <p class="chart-note" id="note-health-stock-trend"></p>
+        <div class="chart-canvas-wrap"><canvas id="chart-health-stock-trend"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Foreign nurses abroad, by destination country (stock)</h3>
+        <div class="chart-filter-row" id="filters-health-stock-foreign"></div>
+        <p class="chart-note" id="note-health-stock-foreign"></p>
+        <div class="chart-canvas-wrap"><canvas id="chart-health-stock-foreign"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Share of Indian nurses among foreign nurses, by destination country (stock)</h3>
+        <div class="chart-filter-row" id="filters-health-share-trend"></div>
+        <p class="chart-note" id="note-health-share-trend"></p>
+        <div class="chart-canvas-wrap"><canvas id="chart-health-share-trend"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Indian nurses abroad, by destination country (flow)</h3>
+        <div class="chart-filter-row" id="filters-health-flow-trend"></div>
+        <p class="chart-note" id="note-health-flow-trend"></p>
+        <div class="chart-canvas-wrap"><canvas id="chart-health-flow-trend"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <h3>Top Destinations for Indian Nurses</h3>
+        <div class="chart-filter-row" id="filters-health-top-dest"></div>
+        <p class="chart-note" id="note-health-top-dest"></p>
+        <div class="chart-canvas-wrap"><canvas id="chart-health-top-dest"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= DATA NOTES TAB ================= -->
+  <div class="tab-panel" id="tab-notes">
+    <div class="data-notes">
+      <div class="section-head">
+        <span class="eyebrow">Reference</span>
+        <h2>Data Notes <span class="tag">Indian Global Mobility Dashboard</span></h2>
+        <p class="section-intro">This dashboard tracks Indians living and working abroad across 10 countries: Canada, France, Germany, Italy, Japan, Poland, South Korea, Spain, the United Kingdom, and the United States. We measure population, employment, and healthcare for each country, shown two ways: a snapshot (one date) and a flow (over one year).</p>
+      </div>
+
+      <!-- Quick-reference bullets (original notes preserved) -->
+      <div class="dn-note-callout" style="margin-top:18px;">
+        <b>Quick Reference — Key Definitions</b>
+        <ul style="margin:8px 0 0;padding-left:18px;font-size:12.5px;line-height:1.7;">
+          <li><b>Stock vs Flow:</b> Stock = a point-in-time total (e.g., total Indians resident as of year-end). Flow = new arrivals/entries during that calendar year. Different units — never combined on the same chart axis.</li>
+          <li><b>Indian share of a country's foreign population/workforce</b> = Indian ÷ that same country's own Total Foreigners figure, for the same year. It is never pooled or averaged using other countries' totals in the denominator.</li>
+          <li><b>"Avg. Indian share" KPIs</b> are a simple, unweighted average of each individual country's own share — not a single global percentage weighted by population size.</li>
+          <li>Each table has its own country list, which differs because the underlying data coverage varies by country and year. Every chart lists exactly which countries are reflected based on the active filters and available data.</li>
+        </ul>
+      </div>
+
+      <!-- Section 1: How the data was sourced -->
+      <div class="dn-section">
+        <h3 class="dn-section-title"><span class="dn-num">1</span> How the data was sourced</h3>
+        <p class="dn-text">No single international database covers all countries and all indicators. So we combined two types of sources:</p>
+        <div class="dn-grid-2col">
+          <div class="dn-card">
+            <div class="dn-card-title">🏛️ National official sources</div>
+            <div class="dn-card-text">Direct data from each country's government: statistics offices, census operations, central registers, immigration departments. Examples: Statistics Canada, Destatis (Germany), ISA (Japan), ONS (UK), US Census Bureau, INSEE (France), ISTAT (Italy), Statistics Poland, Statistics Korea, INE (Spain).</div>
+          </div>
+          <div class="dn-card">
+            <div class="dn-card-title">🌐 International organizations</div>
+            <div class="dn-card-text">Multi-country databases: Eurostat (for European residence permits), the OECD (for standardized international migration and healthcare workforce series).</div>
+          </div>
+        </div>
+        <p class="dn-text">Every number in this dashboard comes from one of these official sources. Nothing is estimated or averaged across sources.</p>
+      </div>
+
+      <!-- Section 2: What "year" means -->
+      <div class="dn-section">
+        <h3 class="dn-section-title"><span class="dn-num">2</span> What "year" means in this dashboard</h3>
+        <p class="dn-text">The same year label (e.g., "2024") means different things in different countries, depending on how that country records its statistics.</p>
+
+        <details class="dn-accordion">
+          <summary>Flow data (new arrivals, permits issued)</summary>
+          <div class="dn-accordion-body">
+            <p class="dn-text" style="margin-top:12px;">Most countries use <strong>calendar year</strong> (January 1 – December 31). For example: UK long-term international migration, Eurostat first permit issuances, and statistics from Canada, France, Germany, Italy, Japan, Poland, South Korea, Spain, and USA.</p>
+            <div class="dn-note-callout"><b>Exception:</b> US Department of State visa issuance follows the US fiscal year (October 1 – September 30).</div>
+          </div>
+        </details>
+
+        <details class="dn-accordion" open>
+          <summary>Stock data (how many are there now)</summary>
+          <div class="dn-accordion-body">
+            <p class="dn-text" style="margin-top:12px;">Stock figures are snapshots taken on specific reference dates:</p>
+            <table class="dn-table">
+              <thead>
+                <tr><th>Reference Date</th><th>Countries</th><th>What It Shows</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><strong>December 31</strong></td><td>Germany (AZR), Japan (ISA), Eurostat permits</td><td>Year-end count</td></tr>
+                <tr><td><strong>January 1</strong></td><td>France (INSEE), Italy (ISTAT), Spain (INE)</td><td>New Year count</td></tr>
+                <tr><td><strong>June 30</strong></td><td>Germany (BA employment), France (Ministry permits)</td><td>Mid-year count</td></tr>
+                <tr><td><strong>Census date</strong></td><td>Canada (May 11, 2021)</td><td>One-time snapshot</td></tr>
+                <tr><td><strong>Annual average</strong></td><td>Spain (Social Security), USA (surveys)</td><td>Average across the year</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <div class="dn-note-callout"><b>Core rule:</b> Stocks (point-in-time counts) and flows (annual movements) are fundamentally different units. Never combine them on the same chart.</div>
+      </div>
+
+      <!-- Section 3: Important counting differences -->
+      <div class="dn-section">
+        <h3 class="dn-section-title"><span class="dn-num">3</span> Important counting differences</h3>
+
+        <h4 class="dn-section-subtitle">Matching sources</h4>
+        <p class="dn-text">When we show "India's share of foreigners" (e.g., "Indians are 2.2% of foreigners"), the Indian number and the total foreigner number always come from the same source and year. We never mix sources in one calculation.</p>
+
+        <h4 class="dn-section-subtitle">The four primary counting bases</h4>
+        <p class="dn-text">Across the 10 countries, foreign populations are categorized using four distinct methodologies:</p>
+
+        <div class="dn-method-list">
+          <div class="dn-method-item">
+            <strong>1. Citizenship (Passport holders):</strong> Germany, Italy, Japan, South Korea, Poland, UK, and France (for visas/permits).<br>
+            <em>Definition:</em> People holding that country's passport.
+          </div>
+          <div class="dn-method-item">
+            <strong>2. Country of birth:</strong> Canada, France (INSEE Census), USA.<br>
+            <em>Definition:</em> People born in that country (including those who became citizens).<br>
+            <em>Note: France uses this for INSEE data but uses citizenship basis for Eurostat permits.</em>
+          </div>
+          <div class="dn-method-item">
+            <strong>3. Work permits vs. actual employment:</strong><br>
+            • <em>Permits:</em> Canada, France, Italy, Poland (GUS), South Korea<br>
+            • <em>Confirmed job:</em> Germany, Spain, Poland (ZUS), USA<br>
+            <em>Definition:</em> Permit countries count authorization to work. Employment countries count people actually working (from payroll or surveys). These two measures are not the same and should never be compared directly.
+          </div>
+          <div class="dn-method-item">
+            <strong>4. Country of training (healthcare only):</strong> OECD data (All countries except Japan and USA).<br>
+            <em>Definition:</em> Medical professionals counted by where they earned their degree, not their citizenship.
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Important notes before reading charts -->
+      <div class="dn-section">
+        <h3 class="dn-section-title"><span class="dn-num">4</span> Important notes before reading charts</h3>
+        <div class="dn-note-callout"><b>Before comparing Indian employment across countries:</b> Check which type of count each country uses (Section 3). Different counting methods mean the numbers are not directly comparable. For example, Germany and Spain count actual employment; Canada, France, Italy, and Poland count work permits.</div>
+        <div class="dn-note-callout"><b>Missing a country from a chart?</b> It likely means that data wasn't available for that year. Full details in the Methodology Note.</div>
+        <div class="dn-note-callout"><b>Need exact reference dates?</b> See Section 2 above.</div>
+        <div class="dn-note-callout"><b>Want to understand one country deeply?</b> See the full Methodology Note, which explains each country's sources in detail.</div>
+      </div>
+
+      <!-- Section 5: Sources by country -->
+      <div class="dn-section">
+        <h3 class="dn-section-title"><span class="dn-num">5</span> Sources by country</h3>
+        <table class="dn-table">
+          <thead>
+            <tr><th>Country</th><th>National Sources</th><th>International Benchmark</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Canada</strong></td><td>Statistics Canada, Immigration Refugees &amp; Citizenship Canada (IRCC)</td><td>OECD (IMD, HWMI)</td></tr>
+            <tr><td><strong>France</strong></td><td>INSEE, Ministry of Interior (AGDREF/DSED)</td><td>Eurostat, OECD (HWMI), UN DESA</td></tr>
+            <tr><td><strong>Germany</strong></td><td>Destatis (Federal Statistics), Federal Employment Agency (BA), Bundesärztekammer</td><td>Eurostat, OECD (HWMI)</td></tr>
+            <tr><td><strong>Italy</strong></td><td>ISTAT (National Statistics)</td><td>Eurostat, OECD (HWMI)</td></tr>
+            <tr><td><strong>Japan</strong></td><td>ISA (Immigration Services Agency)</td><td>ISA data only</td></tr>
+            <tr><td><strong>Poland</strong></td><td>Statistics Poland (GUS), Social Insurance Institution (ZUS)</td><td>Eurostat, OECD (IMD, HWMI)</td></tr>
+            <tr><td><strong>South Korea</strong></td><td>Statistics Korea (KOSTAT), Ministry of Justice (KIS/MOJ)</td><td>OECD (IMD, HWMI)</td></tr>
+            <tr><td><strong>Spain</strong></td><td>INE (National Statistics Institute), Social Security (Seguridad Social)</td><td>Eurostat, OECD (HWMI)</td></tr>
+            <tr><td><strong>United Kingdom</strong></td><td>ONS (Office for National Statistics), Home Office</td><td>Eurostat (historical), OECD (IMD, HWMI)</td></tr>
+            <tr><td><strong>United States</strong></td><td>US Census Bureau (ACS PUMS), Bureau of Labor Statistics (BLS), State Department, MPI</td><td>Census and BLS data only</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Section 6: Source organization links -->
+      <div class="dn-section">
+        <h3 class="dn-section-title"><span class="dn-num">6</span> Source organization links</h3>
+
+        <div class="dn-label">International organizations</div>
+        <div class="dn-links-grid">
+          <a href="https://www.oecd.org" target="_blank" class="dn-link-item">OECD <span>↗</span></a>
+          <a href="https://ec.europa.eu/eurostat" target="_blank" class="dn-link-item">Eurostat <span>↗</span></a>
+          <a href="https://www.un.org/en/desa" target="_blank" class="dn-link-item">UN DESA <span>↗</span></a>
+        </div>
+
+        <div class="dn-label">National statistics agencies &amp; databases</div>
+        <div class="dn-links-grid">
+          <a href="https://open.canada.ca/en" target="_blank" class="dn-link-item">IRCC (Canada) <span>↗</span></a>
+          <a href="https://www.statcan.gc.ca" target="_blank" class="dn-link-item">Statistics Canada <span>↗</span></a>
+          <a href="https://www.insee.fr/fr/statistiques/2381757" target="_blank" class="dn-link-item">INSEE (France) <span>↗</span></a>
+          <a href="https://www.immigration.interieur.gouv.fr" target="_blank" class="dn-link-item">Ministry of Interior (France) <span>↗</span></a>
+          <a href="https://www.destatis.de" target="_blank" class="dn-link-item">Destatis (Germany) <span>↗</span></a>
+          <a href="https://www.arbeitsagentur.de" target="_blank" class="dn-link-item">BA Employment Agency (Germany) <span>↗</span></a>
+          <a href="https://www.istat.it" target="_blank" class="dn-link-item">ISTAT (Italy) <span>↗</span></a>
+          <a href="https://www.moj.go.jp/isa/" target="_blank" class="dn-link-item">ISA (Japan) <span>↗</span></a>
+          <a href="https://stat.gov.pl" target="_blank" class="dn-link-item">Statistics Poland (GUS) <span>↗</span></a>
+          <a href="https://www.zus.pl" target="_blank" class="dn-link-item">ZUS (Poland) <span>↗</span></a>
+          <a href="https://kosis.kr" target="_blank" class="dn-link-item">KOSTAT (Korea) <span>↗</span></a>
+          <a href="https://www.ine.es" target="_blank" class="dn-link-item">INE (Spain) <span>↗</span></a>
+          <a href="https://www.inclusion.gob.es" target="_blank" class="dn-link-item">Ministry of Inclusion (Spain) <span>↗</span></a>
+          <a href="https://www.ons.gov.uk" target="_blank" class="dn-link-item">ONS (UK) <span>↗</span></a>
+          <a href="https://www.gov.uk/government/organisations/home-office" target="_blank" class="dn-link-item">Home Office (UK) <span>↗</span></a>
+          <a href="https://www.census.gov" target="_blank" class="dn-link-item">US Census Bureau <span>↗</span></a>
+          <a href="https://www.bls.gov" target="_blank" class="dn-link-item">Bureau of Labor Statistics (USA) <span>↗</span></a>
+          <a href="https://www.migrationpolicy.org/programs/data-hub" target="_blank" class="dn-link-item">MPI Data Hub (USA) <span>↗</span></a>
+        </div>
+      </div>
+
+      <!-- Methodology footer -->
+      <div class="dn-footer-note">
+        <b>Full methodology</b><br>
+        For detailed explanations of every source, country-by-country gaps, year spans, and data limitations, see the separate Methodology Note for All Countries document.
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer>GATI Foundation — Indian Global Mobility Dashboard · v2</footer>
+
+<script>
+/* ================================================================
+   Google Sheets CSV Data Loader
+   Fetches three published CSV sheets, parses the wide-format data
+   into the same DATA object the dashboard expects, then boots the app.
+   ================================================================ */
+
+/* The global DATA object that app.js consumes */
+var DATA = {};
+
+/* ---------- CSV URLs (one per theme sheet) ---------- */
+   const CSV_URLS = {
+     allReasons:  'DATASETS/all_reason_combined.csv',
+     employment:  'DATASETS/employment_combined.csv',
+     healthcare:  'DATASETS/healthcare_combined.csv'
+   };
+
+/* ---------- Minimal RFC 4180 CSV parser ---------- */
+function parseCSV(text) {
+  const rows = [];
+  let i = 0;
+  while (i < text.length) {
+    const row = [];
+    while (true) {
+      let val = '';
+      if (text[i] === '"') {
+        i++; // skip opening quote
+        while (i < text.length) {
+          if (text[i] === '"') {
+            if (text[i + 1] === '"') { val += '"'; i += 2; }
+            else { i++; break; }
+          } else { val += text[i]; i++; }
+        }
+      } else {
+        while (i < text.length && text[i] !== ',' && text[i] !== '\r' && text[i] !== '\n') {
+          val += text[i]; i++;
+        }
+      }
+      row.push(val);
+      if (i < text.length && text[i] === ',') { i++; continue; }
+      break;
+    }
+    // skip line endings
+    if (text[i] === '\r') i++;
+    if (text[i] === '\n') i++;
+    rows.push(row);
+  }
+  return rows;
+}
+
+/* ---------- Number parser (handles Indian comma grouping like "3,71,773") ---------- */
+function parseNumber(s) {
+  if (!s || s === 'N/A' || s.trim() === '') return null;
+  const cleaned = s.replace(/,/g, '').trim();
+  if (cleaned === '' || cleaned === 'N/A') return null;
+  const n = Number(cleaned);
+  return isNaN(n) ? null : n;
+}
+
+/* ---------- Country column map ----------
+   The CSV header uses alternating Country, Period columns.
+   We identify the 10 country columns by their header names.        */
+const COUNTRY_HEADERS = [
+  'Germany', 'Japan', 'Italy', 'Spain', 'USA', 'UK',
+  'South Korea', 'France', 'Canada', 'Poland'
+];
+
+/* ---------- Map Nationality text ---------- */
+function mapNationality(raw) {
+  const lc = raw.trim().toLowerCase();
+  if (lc === 'indians' || lc === 'indian') return 'Indian';
+  if (lc.startsWith('total foreign')) return 'Total Foreigners';
+  return raw.trim();
+}
+
+/* ---------- Parse one sheet CSV into flat row objects ---------- */
+function parseSheetCSV(csvText) {
+  const grid = parseCSV(csvText);
+  if (grid.length < 2) return [];
+
+  /* Identify country column indices from header row */
+  const header = grid[0].map(h => h.trim());
+  const countryIndices = []; // [{name, idx}]
+  for (let ci = 4; ci < header.length; ci++) {
+    const hdr = header[ci].trim();
+    const match = COUNTRY_HEADERS.find(c => hdr.toLowerCase() === c.toLowerCase()
+      || hdr.toLowerCase().replace(/\s+/g,'') === c.toLowerCase().replace(/\s+/g,''));
+    if (match) {
+      countryIndices.push({ name: match, idx: ci });
+    }
+  }
+
+  const rows = [];
+  for (let ri = 1; ri < grid.length; ri++) {
+    const r = grid[ri];
+    if (!r || r.length < 5) continue;
+
+    const type = (r[1] || '').trim();           // Stock or Flow
+    const nationality = mapNationality(r[2]);    // Indian or Total Foreigners
+    const year = parseInt(r[3], 10);
+    if (isNaN(year)) continue;
+
+    for (const { name: country, idx } of countryIndices) {
+      const val = parseNumber(r[idx]);
+      if (val !== null) {
+        rows.push({ Year: year, Country: country, Nationality: nationality, Value: val, Type: type });
+      }
+    }
+  }
+  return rows;
+}
+
+/* ---------- Build the DATA tables from parsed rows ---------- */
+function buildDataTables(allReasonRows, employmentRows, healthcareRows) {
+
+  function filterRows(src, type) {
+    return src.filter(r => r.Type === type).map(({ Year, Country, Nationality, Value }) =>
+      ({ Year, Country, Nationality, Value }));
+  }
+
+  DATA.AllReasons_Stock = filterRows(allReasonRows, 'Stock');
+  DATA.AllReasons_Flow  = filterRows(allReasonRows, 'Flow');
+
+  DATA.Employment_Stock = filterRows(employmentRows, 'Stock');
+  DATA.Employment_Flow  = filterRows(employmentRows, 'Flow');
+
+  /* Healthcare — Stock and Flow rows */
+  DATA.Healthcare_Nurses_Stock = filterRows(healthcareRows, 'Stock');
+  DATA.Healthcare_Nurses_Flow  = filterRows(healthcareRows, 'Flow');
+
+  /* Employment_Stock_2024_Snapshot: widest-coverage snapshot = all Employment Stock rows for 2024 */
+  DATA.Employment_Stock_2024_Snapshot = DATA.Employment_Stock
+    .filter(r => r.Year === 2024)
+    .map(r => ({ ...r }));
+
+  /* Remove USA from all tables — excluded from every chart, KPI and filter */
+  Object.keys(DATA).forEach(k => {
+    DATA[k] = DATA[k].filter(r => r.Country !== 'USA');
+  });
+
+  /* Remove France & Poland from population stock — Eurostat permit data, not population register */
+  DATA.AllReasons_Stock = DATA.AllReasons_Stock.filter(
+    r => r.Country !== 'France' && r.Country !== 'Poland'
+  );
+
+  /* Flow — split by methodology group (Canada excluded from both) */
+  const FLOW_GROUP_A = ['Germany', 'UK', 'South Korea'];
+  const FLOW_GROUP_B = ['France', 'Poland', 'Spain', 'Italy'];
+  DATA.AllReasons_Flow_A = DATA.AllReasons_Flow.filter(r => FLOW_GROUP_A.includes(r.Country));
+  DATA.AllReasons_Flow_B = DATA.AllReasons_Flow.filter(r => FLOW_GROUP_B.includes(r.Country));
+}
+
+/* ---------- Show / hide loading overlay ---------- */
+function showLoading() {
+  let overlay = document.getElementById('data-loading-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'data-loading-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(246,249,250,0.92);';
+    overlay.innerHTML = '<div style="text-align:center;font-family:Poppins,sans-serif;">'
+      + '<div style="width:48px;height:48px;border:4px solid #84D2E2;border-top-color:#006B76;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 18px;"></div>'
+      + '<div style="font-size:15px;font-weight:600;color:#006B76;">Loading dashboard data…</div>'
+      + '<style>@keyframes spin{to{transform:rotate(360deg)}}</style>'
+      + '</div>';
+    document.body.appendChild(overlay);
+  }
+  overlay.style.display = 'flex';
+}
+
+function hideLoading() {
+  const overlay = document.getElementById('data-loading-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+function showError(msg) {
+  hideLoading();
+  let el = document.getElementById('data-error-banner');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'data-error-banner';
+    el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#C0392B;color:#fff;padding:14px 24px;font-family:Poppins,sans-serif;font-size:13.5px;text-align:center;';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+/* ---------- Main loader ---------- */
+async function loadDashboardData() {
+  showLoading();
+  try {
+    const [arResp, emResp, hcResp] = await Promise.all([
+      fetch(CSV_URLS.allReasons),
+      fetch(CSV_URLS.employment),
+      fetch(CSV_URLS.healthcare)
+    ]);
+
+    if (!arResp.ok) throw new Error('Failed to load All Reasons CSV (' + arResp.status + ')');
+    if (!emResp.ok) throw new Error('Failed to load Employment CSV (' + emResp.status + ')');
+    if (!hcResp.ok) throw new Error('Failed to load Healthcare CSV (' + hcResp.status + ')');
+
+    const [arText, emText, hcText] = await Promise.all([
+      arResp.text(), emResp.text(), hcResp.text()
+    ]);
+
+    const allReasonRows  = parseSheetCSV(arText);
+    const employmentRows = parseSheetCSV(emText);
+    const healthcareRows = parseSheetCSV(hcText);
+
+    buildDataTables(allReasonRows, employmentRows, healthcareRows);
+
+    hideLoading();
+
+    /* Boot the dashboard (defined in app.js) */
+    initDashboard();
+
+  } catch (err) {
+    console.error('Dashboard data load error:', err);
+    showError('Unable to load dashboard data. Please check your internet connection and refresh. (' + err.message + ')');
+  }
+}
+</script>
+<script src="app.js"></script>
+<script>
+/* Close country nav dropdown on outside click */
+document.addEventListener('click', e => {
+  if (!e.target.closest('.country-nav')) {
+    document.querySelectorAll('.country-nav.open').forEach(n => n.classList.remove('open'));
+  }
+});
+/* Kick off data loading once both scripts and DOM are ready */
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadDashboardData);
+} else {
+  loadDashboardData();
+}
+</script>
+</body>
+</html>

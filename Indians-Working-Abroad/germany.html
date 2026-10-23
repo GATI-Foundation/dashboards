@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GATI — Germany Country Dashboard</title>
+<meta name="description" content="GATI Germany Country Dashboard — Indian population, migration flows, employment, and healthcare workforce insights based on official German and EU statistics.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --teal:#006B76;
+  --teal-dark:#00333A;
+  --teal-light:#84D2E2;
+  --gold:#E5A812;
+  --gold-light:#FFCC4E;
+  --gold-dark:#8C6A1F;
+  --gray:#839097;
+  --gray-light:#D8E2E7;
+  --black:#000000;
+  --white:#FFFFFF;
+  --bg:#F6F9FA;
+  --card-border:#E1E9EB;
+  --font:'Poppins',sans-serif;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:var(--font);background:var(--bg);color:#1A2327;}
+h1,h2,h3{font-family:var(--font);margin:0;}
+p{margin:0;}
+a{color:inherit;}
+
+/* ---------- Site Header ---------- */
+.site-header{
+  background:var(--white);height:84px;display:flex;align-items:center;
+  padding:0 40px 0 32px;gap:12px;
+  box-shadow:0 1px 4px rgba(0,0,0,.08);position:relative;z-index:10;
+}
+.site-header-logo{height:70px;width:auto;display:block;flex-shrink:0;}
+.site-header-title{
+  font-family:var(--font);font-weight:700;font-size:28px;color:var(--teal);
+  letter-spacing:normal;line-height:1.2;white-space:nowrap;
+}
+
+/* ---------- Country Nav ---------- */
+.country-nav{position:relative;margin-left:auto;}
+.country-nav-btn{
+  background:var(--teal);color:var(--white);border:none;
+  padding:9px 20px;border-radius:8px;font-family:var(--font);
+  font-size:13px;font-weight:600;cursor:pointer;
+  transition:background .15s;display:flex;align-items:center;gap:6px;
+}
+.country-nav-btn:hover{background:#00828F;}
+.country-nav-btn::after{content:'▾';font-size:10px;margin-left:2px;}
+.country-nav-menu{
+  display:none;position:absolute;top:calc(100% + 8px);right:0;
+  background:var(--white);border-radius:10px;
+  box-shadow:0 8px 32px rgba(0,0,0,.14);min-width:220px;
+  padding:6px;z-index:100;border:1px solid var(--card-border);
+}
+.country-nav.open .country-nav-menu{display:block;}
+.country-nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  border-radius:8px;text-decoration:none;color:#1A2327;
+  font-size:13.5px;font-weight:500;font-family:var(--font);transition:background .1s;
+}
+.country-nav-item:hover{background:#F0F8F9;}
+.country-nav-item.active{background:var(--teal);color:var(--white);}
+.country-flag{font-size:18px;line-height:1;}
+
+/* ---------- Hero ---------- */
+.topbar{background:var(--teal);color:var(--white);padding:22px 40px 24px;display:flex;align-items:center;gap:18px;}
+.hero-flag{font-size:44px;line-height:1;}
+.hero-text h1{font-size:28px;font-weight:800;margin-bottom:4px;}
+.hero-text .subtitle{font-size:14px;color:#CFE9EC;max-width:760px;line-height:1.5;}
+
+/* ---------- Executive KPI Strip ---------- */
+.exec-strip{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:16px;
+  padding:22px 40px 6px;
+}
+.exec-card{
+  background:var(--white);border:1px solid var(--card-border);
+  border-top:3px solid var(--gold);border-radius:10px;padding:20px 22px;
+}
+.exec-card-header{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;
+}
+.exec-card-title{
+  font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.4px;
+}
+.exec-card-period{font-size:11px;color:var(--gray);font-weight:600;}
+.exec-primary{display:flex;align-items:baseline;gap:12px;margin-bottom:4px;}
+.exec-primary-value{font-size:26px;font-weight:800;color:var(--teal-dark);line-height:1.1;}
+.exec-primary-label{font-size:10.5px;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+.exec-cagr{
+  display:inline-flex;align-items:center;gap:4px;
+  background:#E8F5E9;color:#2E7D32;font-size:11.5px;font-weight:700;
+  padding:3px 10px;border-radius:12px;
+}
+.exec-cagr.negative{background:#FFEBEE;color:#C62828;}
+.exec-cagr-period{
+  display:inline-flex;align-items:center;
+  background:#F6F9FA;color:var(--gray);border:1px solid var(--card-border);
+  font-size:11.5px;font-weight:700;padding:2px 10px;border-radius:12px;
+}
+.exec-cagr-wrap{display:flex;gap:8px;margin-bottom:14px;}
+.exec-secondary{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  padding-top:12px;border-top:1px solid var(--card-border);
+}
+.exec-metric-label{font-size:10px;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+.exec-metric-value{font-size:15px;font-weight:700;color:var(--teal-dark);margin-top:2px;}
+
+/* ---------- Tab nav ---------- */
+.section-nav{
+  display:flex;gap:0;background:var(--teal-dark);padding:0 40px;
+  font-size:13.5px;font-weight:600;overflow-x:auto;
+}
+.tab-btn{
+  background:none;border:none;color:var(--teal-light);
+  padding:13px 22px;font-family:var(--font);font-size:13.5px;font-weight:600;
+  cursor:pointer;border-bottom:3px solid transparent;transition:all .15s ease;
+  white-space:nowrap;
+}
+.tab-btn:hover{color:var(--gold-light);}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);background:rgba(255,255,255,.05);}
+
+/* ---------- Tab panels ---------- */
+.tab-panel{display:none;padding:24px 40px 30px;}
+.tab-panel.active{display:block;}
+
+/* ---------- Section head ---------- */
+.section-head{border-bottom:3px solid var(--gold);padding-bottom:12px;margin-bottom:18px;}
+.eyebrow{font-size:11.5px;font-weight:700;color:var(--gold-dark);text-transform:uppercase;letter-spacing:1px;}
+.section-head h2{font-size:22px;color:var(--teal);font-weight:700;margin-top:4px;}
+.section-head h2 .tag{
+  font-size:11.5px;background:var(--teal-light);color:var(--teal-dark);padding:3px 9px;
+  border-radius:12px;font-weight:700;vertical-align:middle;margin-left:8px;
+}
+.section-intro{font-size:13.8px;color:#3B4A50;max-width:920px;line-height:1.6;margin-top:8px;}
+
+/* ---------- Charts ---------- */
+.chart-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+.chart-card{
+  background:var(--white);border:1px solid var(--card-border);border-radius:10px;
+  padding:16px 18px 12px;display:flex;flex-direction:column;
+}
+.chart-card.wide{grid-column:1 / -1;}
+.chart-card h3{font-size:14.5px;font-weight:700;color:var(--teal-dark);}
+.chart-note{font-size:11.5px;color:var(--gray);margin-top:5px;margin-bottom:10px;line-height:1.5;min-height:18px;}
+.chart-canvas-wrap{position:relative;height:300px;}
+.chart-canvas-wrap.tall{height:400px;}
+
+/* ---------- Healthcare KPI cards ---------- */
+.health-kpi-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:18px;}
+.health-kpi-card{
+  background:var(--white);border:1px solid var(--card-border);border-top:3px solid var(--gold);
+  border-radius:10px;padding:18px 20px;
+}
+.health-kpi-title{font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px;}
+.health-kpi-row{display:flex;gap:16px;flex-wrap:wrap;}
+.health-kpi-metric{flex:1;min-width:80px;}
+.health-kpi-metric .label{font-size:10px;color:var(--gray);font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+.health-kpi-metric .value{font-size:18px;font-weight:800;color:var(--teal-dark);margin-top:2px;}
+.health-kpi-metric .value.small{font-size:15px;}
+
+/* ---------- Insight cards ---------- */
+.insight-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.insight-card{
+  background:var(--white);border:1px solid var(--card-border);border-left:4px solid var(--teal);
+  border-radius:10px;padding:18px 22px;
+}
+.insight-card.gold{border-left-color:var(--gold);}
+.insight-card.highlight{border-left-color:#2E7D32;}
+.insight-title{font-size:13px;font-weight:700;color:var(--teal-dark);margin-bottom:6px;}
+.insight-body{font-size:12.5px;color:#3B4A50;line-height:1.6;}
+.insight-body b{color:var(--teal-dark);}
+
+/* ---------- Footer ---------- */
+footer{background:var(--teal-dark);color:#9FC6CA;text-align:center;font-size:11.5px;padding:14px;}
+
+@media (max-width:900px){
+  .chart-grid{grid-template-columns:1fr;}
+  .exec-strip{grid-template-columns:1fr;}
+  .insight-grid{grid-template-columns:1fr;}
+  .health-kpi-strip{grid-template-columns:1fr;}
+  .site-header{padding:0 18px 0 18px;gap:16px;height:68px;}
+  .site-header-logo{height:44px;}
+  .site-header-title{font-size:20px;}
+  .topbar,.section-nav,.tab-panel{padding-left:18px;padding-right:18px;}
+  .exec-strip{padding-left:18px;padding-right:18px;}
+  .country-nav-btn{font-size:11.5px;padding:7px 14px;}
+}
+</style>
+</head>
+<body>
+
+<div class="site-header">
+  <a href="index.html" style="display:flex; align-items:center; text-decoration:none;">
+    <img src="gati-logo.png" alt="GATI — Global Access to Talent from India" class="site-header-logo">
+  </a>
+  <span class="site-header-title">Germany Country Dashboard</span>
+  <div class="country-nav" id="countryNav">
+    <button class="country-nav-btn" onclick="this.parentElement.classList.toggle('open')">Country Profiles</button>
+    <div class="country-nav-menu">
+      <a href="index.html" class="country-nav-item">
+        <span class="country-flag">🌐</span> Overview
+      </a>
+      <a href="japan.html" class="country-nav-item">
+        <span class="country-flag">🇯🇵</span> Japan
+      </a>
+      <a href="germany.html" class="country-nav-item active">
+        <span class="country-flag">🇩🇪</span> Germany
+      </a>
+    </div>
+  </div>
+</div>
+
+<header class="topbar">
+  <span class="hero-flag">🇩🇪</span>
+  <div class="hero-text">
+    <h1>Germany</h1>
+    <p class="subtitle">Indian population, migration flows, employment, and healthcare workforce — multi-source official data from Destatis, Eurostat, Federal Employment Agency & OECD.</p>
+  </div>
+</header>
+
+<!-- ===== Executive KPI Strip ===== -->
+<div class="exec-strip">
+  <div class="exec-card" id="exec-pop">
+    <div class="exec-card-header">
+      <span class="exec-card-title">Indian Population (Stock)</span>
+      <span class="exec-card-period" id="exec-pop-period">—</span>
+    </div>
+    <div class="exec-primary">
+      <span class="exec-primary-value" id="exec-pop-indian">—</span>
+      <span class="exec-primary-label">Indians</span>
+    </div>
+    <div class="exec-cagr-wrap">
+      <div class="exec-cagr" id="exec-pop-cagr">CAGR —</div>
+      <div class="exec-cagr-period" id="exec-pop-cagr-period">—</div>
+    </div>
+    <div class="exec-secondary">
+      <div><div class="exec-metric-label">Total Foreign</div><div class="exec-metric-value" id="exec-pop-foreign">—</div></div>
+      <div><div class="exec-metric-label">India's Share</div><div class="exec-metric-value" id="exec-pop-share">—</div></div>
+    </div>
+  </div>
+
+  <div class="exec-card" id="exec-emp">
+    <div class="exec-card-header">
+      <span class="exec-card-title">Indian Employment (BA)</span>
+      <span class="exec-card-period" id="exec-emp-period">—</span>
+    </div>
+    <div class="exec-primary">
+      <span class="exec-primary-value" id="exec-emp-indian">—</span>
+      <span class="exec-primary-label">Indians</span>
+    </div>
+    <div class="exec-cagr-wrap">
+      <div class="exec-cagr" id="exec-emp-cagr">CAGR —</div>
+      <div class="exec-cagr-period" id="exec-emp-cagr-period">—</div>
+    </div>
+    <div class="exec-secondary">
+      <div><div class="exec-metric-label">Total Foreign</div><div class="exec-metric-value" id="exec-emp-foreign">—</div></div>
+      <div><div class="exec-metric-label">India's Share</div><div class="exec-metric-value" id="exec-emp-share">—</div></div>
+    </div>
+  </div>
+
+  <div class="exec-card" id="exec-health">
+    <div class="exec-card-header">
+      <span class="exec-card-title">Indian Physicians (Stock)</span>
+      <span class="exec-card-period" id="exec-health-period">—</span>
+    </div>
+    <div class="exec-primary">
+      <span class="exec-primary-value" id="exec-health-indian">—</span>
+      <span class="exec-primary-label">Indians</span>
+    </div>
+    <div class="exec-cagr-wrap">
+      <div class="exec-cagr" id="exec-health-cagr">CAGR —</div>
+      <div class="exec-cagr-period" id="exec-health-cagr-period">—</div>
+    </div>
+    <div class="exec-secondary">
+      <div><div class="exec-metric-label">Total Physicians</div><div class="exec-metric-value" id="exec-health-total">—</div></div>
+      <div><div class="exec-metric-label">Nurse Inflow (Latest)</div><div class="exec-metric-value" id="exec-health-nurse">—</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Tab Navigation ===== -->
+<nav class="section-nav" id="sectionNav">
+  <button class="tab-btn active" data-tab="population">Population</button>
+  <button class="tab-btn" data-tab="migration">Migration Flows</button>
+  <button class="tab-btn" data-tab="employment">Employment</button>
+  <button class="tab-btn" data-tab="healthcare">Healthcare</button>
+  <button class="tab-btn" data-tab="insights">Key Insights</button>
+</nav>
+
+<main>
+  <!-- ================= POPULATION TAB ================= -->
+  <div class="tab-panel active" id="tab-population">
+    <div class="section-head">
+      <span class="eyebrow">Stock Data</span>
+      <h2>Indian & Foreign Population in Germany <span class="tag">All purposes</span></h2>
+      <p class="section-intro">Indian citizens registered in Germany for any purpose (work, study, family, humanitarian) alongside total foreign population trends.</p>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Indian Citizens in Germany — Trend</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-indian-stock"></canvas></div>
+        <p class="chart-note" id="note-de-indian-stock"></p>
+      </div>
+      <div class="chart-card">
+        <h3>Total Foreign Population — Trend</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-foreign-stock"></canvas></div>
+        <p class="chart-note" id="note-de-foreign-stock"></p>
+      </div>
+      <div class="chart-card">
+        <h3>India's Share of Foreign Population — Trend</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-share-stock"></canvas></div>
+        <p class="chart-note" id="note-de-share-stock"></p>
+      </div>
+      <div class="chart-card">
+        <h3>Employment Permits — Indian Citizens (Stock)</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-euro-permits-indian"></canvas></div>
+        <p class="chart-note" id="note-de-euro-permits-indian"></p>
+      </div>
+      <div class="chart-card">
+        <h3>Employment Permits — All Non-EU Citizens (Stock)</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-euro-permits-noneu"></canvas></div>
+        <p class="chart-note" id="note-de-euro-permits-noneu"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MIGRATION FLOWS TAB ================= -->
+  <div class="tab-panel" id="tab-migration">
+    <div class="section-head">
+      <span class="eyebrow">Flow Data</span>
+      <h2>Migration Flows <span class="tag">Annual & Monthly</span></h2>
+      <p class="section-intro">Cross-border movements of Indian citizens and total foreign nationals — arrivals, departures, and net migration balance.</p>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Indian Migration — Arrivals, Departures & Net</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-indian-flows"></canvas></div>
+        <p class="chart-note" id="note-de-indian-flows"></p>
+      </div>
+      <div class="chart-card">
+        <h3>Total Foreign Migration — Arrivals, Departures & Net</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-foreign-flows"></canvas></div>
+        <p class="chart-note" id="note-de-foreign-flows"></p>
+      </div>
+      <div class="chart-card">
+        <h3>Indian Monthly Migration Trend</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-monthly-indian"></canvas></div>
+        <p class="chart-note" id="note-de-monthly-indian"></p>
+      </div>
+      <div class="chart-card">
+        <h3>Monthly Net Migration — Indian vs Total Foreign</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-monthly-compare"></canvas></div>
+        <p class="chart-note" id="note-de-monthly-compare"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= EMPLOYMENT TAB ================= -->
+  <div class="tab-panel" id="tab-employment">
+    <div class="section-head">
+      <span class="eyebrow">Labour Market</span>
+      <h2>Employment & Labour Market <span class="tag">Federal Employment Agency</span></h2>
+      <p class="section-intro">Indian workforce in Germany's labour market — employees, social security contributors, unemployment, and welfare metrics as of June 30 each year.</p>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Indian Employees in Germany — Trend</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-indian-emp"></canvas></div>
+        <p class="chart-note" id="note-de-indian-emp"></p>
+      </div>
+      <div class="chart-card">
+        <h3>All Foreign Employees — Trend</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-foreign-emp"></canvas></div>
+        <p class="chart-note" id="note-de-foreign-emp"></p>
+      </div>
+      <div class="chart-card">
+        <h3>India's Share of Foreign Workforce — Trend</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-emp-share"></canvas></div>
+        <p class="chart-note" id="note-de-emp-share"></p>
+      </div>
+      <div class="chart-card">
+        <h3>Indian Labour Market Breakdown</h3>
+        <div class="chart-canvas-wrap tall"><canvas id="chart-de-indian-breakdown"></canvas></div>
+        <p class="chart-note" id="note-de-indian-breakdown"></p>
+      </div>
+      <div class="chart-card wide">
+        <h3>Employment Permits — First-Time Issuances (Flow)</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-euro-permits-flow"></canvas></div>
+        <p class="chart-note" id="note-de-euro-permits-flow"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= HEALTHCARE TAB ================= -->
+  <div class="tab-panel" id="tab-healthcare">
+    <div class="section-head">
+      <span class="eyebrow">Healthcare Workforce</span>
+      <h2>Healthcare — Physicians & Nurses <span class="tag">OECD & BA data</span></h2>
+      <p class="section-intro">Indian-trained physicians and nurses in Germany's healthcare system — stock, inflow trends, and India's position among foreign nursing nationalities.</p>
+    </div>
+    <div class="health-kpi-strip">
+      <div class="health-kpi-card" id="health-kpi-physicians">
+        <div class="health-kpi-title">Indian Physicians <span style="color:var(--gray); text-transform:none; font-weight:600; font-size:11px; float:right;" id="hk-phys-year">—</span></div>
+        <div class="health-kpi-row">
+          <div class="health-kpi-metric"><div class="label">Indian Stock</div><div class="value" id="hk-phys-stock">—</div></div>
+          <div class="health-kpi-metric"><div class="label">Total Active</div><div class="value small" id="hk-phys-total">—</div></div>
+          <div class="health-kpi-metric"><div class="label">Annual Inflow</div><div class="value small" id="hk-phys-inflow">—</div></div>
+        </div>
+      </div>
+      <div class="health-kpi-card" id="health-kpi-nurses">
+        <div class="health-kpi-title">Indian Nurses <span style="color:var(--gray); text-transform:none; font-weight:600; font-size:11px; float:right;" id="hk-nurse-year">—</span></div>
+        <div class="health-kpi-row">
+          <div class="health-kpi-metric"><div class="label">Annual Inflow</div><div class="value" id="hk-nurse-inflow">—</div></div>
+          <div class="health-kpi-metric"><div class="label">Total Active Nurses (DE)</div><div class="value small" id="hk-nurse-total">—</div></div>
+          <div class="health-kpi-metric"><div class="label">Hospital Nursing Rank</div><div class="value small" id="hk-nurse-rank">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h3>Indian Physicians — Stock Trend</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-phys-stock"></canvas></div>
+        <p class="chart-note" id="note-de-phys-stock"></p>
+      </div>
+      <div class="chart-card">
+        <h3>Indian Nurse Inflow — Annual Trend</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-nurse-inflow"></canvas></div>
+        <p class="chart-note" id="note-de-nurse-inflow"></p>
+      </div>
+      <div class="chart-card">
+        <h3>Indian Physician Inflow — Annual Trend</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-phys-inflow"></canvas></div>
+        <p class="chart-note" id="note-de-phys-inflow"></p>
+      </div>
+      <div class="chart-card">
+        <h3>Top 10 Nationalities in Hospital Nursing (2023)</h3>
+        <div class="chart-canvas-wrap tall"><canvas id="chart-de-nursing-rank"></canvas></div>
+        <p class="chart-note" id="note-de-nursing-rank"></p>
+      </div>
+      <div class="chart-card">
+        <h3>Total Active Nurses in Germany</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-nurses-total"></canvas></div>
+        <p class="chart-note" id="note-de-nurses-total"></p>
+      </div>
+      <div class="chart-card">
+        <h3>Total Active Physicians in Germany</h3>
+        <div class="chart-canvas-wrap"><canvas id="chart-de-phys-total"></canvas></div>
+        <p class="chart-note" id="note-de-phys-total"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= INSIGHTS TAB ================= -->
+  <div class="tab-panel" id="tab-insights">
+    <div class="section-head">
+      <span class="eyebrow">Auto-generated Analysis</span>
+      <h2>Key Insights <span class="tag">Data-driven highlights</span></h2>
+      <p class="section-intro">Automatically identified patterns and notable findings from Germany's Indian population, migration, employment, and healthcare datasets.</p>
+    </div>
+    <div class="insight-grid" id="insight-grid">
+      <!-- Dynamically populated by germany-app.js -->
+    </div>
+  </div>
+</main>
+
+<footer>GATI Foundation — Germany Country Dashboard · v1</footer>
+
+<script>
+/* ================================================================
+   Germany JSON API Data Loader
+   ================================================================ */
+const DE_API_URL = 'DATASETS/GERMANY/germany_data.json';
+/* ---------- Show / hide loading overlay ---------- */
+function showLoading() {
+  let overlay = document.getElementById('data-loading-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'data-loading-overlay';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(246,249,250,0.92);';
+    overlay.innerHTML = '<div style="text-align:center;font-family:Poppins,sans-serif;">'
+      + '<div style="width:48px;height:48px;border:4px solid #84D2E2;border-top-color:#006B76;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 18px;"></div>'
+      + '<div style="font-size:15px;font-weight:600;color:#006B76;">Loading Germany dashboard data…</div>'
+      + '<style>@keyframes spin{to{transform:rotate(360deg)}}</style>'
+      + '</div>';
+    document.body.appendChild(overlay);
+  }
+  overlay.style.display = 'flex';
+}
+
+function hideLoading() {
+  const overlay = document.getElementById('data-loading-overlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
+function showError(msg) {
+  hideLoading();
+  let el = document.getElementById('data-error-banner');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'data-error-banner';
+    el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;background:#C0392B;color:#fff;padding:14px 24px;font-family:Poppins,sans-serif;font-size:13.5px;text-align:center;';
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+/* ---------- Main loader ---------- */
+async function loadGermanyData() {
+  showLoading();
+  try {
+    const resp = await fetch(DE_API_URL);
+    if (!resp.ok) throw new Error('Failed to load Germany API (' + resp.status + ')');
+    const json = await resp.json();
+    processGermanyData(json);
+    hideLoading();
+    initGermanyDashboard();
+  } catch (err) {
+    console.error('Germany data load error:', err);
+    showError('Unable to load Germany data. Please check your connection and refresh. (' + err.message + ')');
+  }
+}
+
+/* Close country nav dropdown on outside click */
+document.addEventListener('click', e => {
+  if (!e.target.closest('.country-nav')) {
+    document.querySelectorAll('.country-nav.open').forEach(n => n.classList.remove('open'));
+  }
+});
+</script>
+<script src="germany-app.js"></script>
+<script>
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadGermanyData);
+} else {
+  loadGermanyData();
+}
+</script>
+</body>
+</html>

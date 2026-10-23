@@ -1,0 +1,21 @@
+Theme,Type,Nationality,Year,Germany ,Period,Japan,Period,Italy,Period,Spain,Period,USA,USA Healthcare-Total,Period,UK,Period,South Korea,Period,France,France-Physicians,Period,Canada,Period,Poland,Period
+HealthCare (Nurses),Stock,Indians,2020,N/A,N/A,N/A,As of June,"1,475",N/A,N/A,N/A,N/A,N/A,N/A,"26,366",N/A,N/A,N/A,N/A,18,N/A,"6,127",N/A,2,N/A
+HealthCare (Nurses),Stock,Total foreigners,2020,N/A,N/A,N/A,As of June,"22,610",N/A,N/A,N/A,N/A,N/A,N/A,"111,138",N/A,N/A,N/A,19285,"25,819",N/A,"419,183",N/A,315,N/A
+HealthCare (Nurses),Flow,Indians,2020,828,N/A,N/A,N/A,25,N/A,0,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,1,N/A,"1,082",N/A,N/A,N/A
+HealthCare (Nurses),Flow,Total foreigners,2020,N/A,N/A,N/A,N/A,N/A,N/A,514,N/A,N/A,N/A,N/A,N/A,N/A,29,N/A,285,"1,054",N/A,"3,348",N/A,16,N/A
+HealthCare (Nurses),Stock,Indians,2021,N/A,N/A,37,As of June,"1,451",N/A,N/A,N/A,N/A,48993,N/A,"32,565",N/A,N/A,N/A,N/A,18,N/A,"6,828",N/A,2,N/A
+HealthCare (Nurses),Stock,Total foreigners,2021,N/A,N/A,"3,064",As of June,"23,712",N/A,N/A,N/A,N/A,N/A,N/A,"124,036",N/A,N/A,N/A,19876,"26,593",N/A,"428,867",N/A,582,N/A
+HealthCare (Nurses),Flow,Indians,2021,"1,314",N/A,N/A,N/A,33,N/A,0,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,1,N/A,"1,174",N/A,N/A,N/A
+HealthCare (Nurses),Flow,Total foreigners,2021,N/A,N/A,N/A,N/A,N/A,N/A,597,N/A,N/A,N/A,N/A,N/A,N/A,37,N/A,384,"1,251",N/A,"3,738",N/A,175,N/A
+HealthCare (Nurses),Stock,Indians,2022,N/A,N/A,38,As of June,"1,385",N/A,N/A,N/A,N/A,"52,420",N/A,"37,809",N/A,N/A,N/A,N/A,17,N/A,"7,849",N/A,2,N/A
+HealthCare (Nurses),Stock,Total foreigners,2022,N/A,N/A,"5,339",As of June,"23,764",N/A,N/A,N/A,N/A,N/A,N/A,"135,020",N/A,N/A,N/A,N/A,"27,652",N/A,"433,370",N/A,"1,353",N/A
+HealthCare (Nurses),Flow,Indians,2022,"1,755",N/A,N/A,N/A,42,N/A,0,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,1,N/A,"1,605",N/A,N/A,N/A
+HealthCare (Nurses),Flow,Total foreigners,2022,N/A,N/A,N/A,N/A,N/A,N/A,731,N/A,N/A,N/A,N/A,N/A,N/A,39,N/A,N/A,"1,562",N/A,"4,446",N/A,772,N/A
+HealthCare (Nurses),Stock,Indians,2023,"4,083",N/A,41,As of June,"1,379",N/A,N/A,N/A,N/A,"55,429",N/A,"48,409",N/A,N/A,N/A,N/A,17,N/A,"10,234",N/A,2,N/A
+HealthCare (Nurses),Stock,Total foreigners,2023,N/A,N/A,"8,093",As of June,"23,311",N/A,N/A,N/A,N/A,N/A,N/A,"156,851",N/A,N/A,N/A,N/A,"29,180",N/A,"442,400",N/A,"2,283",N/A
+HealthCare (Nurses),Flow,Indians,2023,"2,799",N/A,N/A,N/A,51,N/A,1,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,0,N/A,"3,671",N/A,N/A,N/A
+HealthCare (Nurses),Flow,Total foreigners,2023,N/A,N/A,N/A,N/A,N/A,N/A,884,N/A,N/A,N/A,N/A,N/A,N/A,24,N/A,N/A,"2,191",N/A,"8,093",N/A,868,N/A
+HealthCare (Nurses),Stock,Indians,2024,N/A,N/A,40,As of June,"1,488",N/A,N/A,N/A,N/A,"47,974",N/A,"62,369",N/A,N/A,N/A,N/A,19,N/A,N/A,N/A,2,N/A
+HealthCare (Nurses),Stock,Total foreigners,2024,"177,320",N/A,"10,468",As of June,"23,033",N/A,N/A,N/A,N/A,N/A,N/A,"182,607",N/A,N/A,N/A,N/A,"31,136",N/A,N/A,N/A,"2,812",N/A
+HealthCare (Nurses),Flow,Indians,2024,N/A,N/A,N/A,N/A,96,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,2,N/A,N/A,N/A,N/A,N/A
+HealthCare (Nurses),Flow,Total foreigners,2024,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,N/A,19,N/A,N/A,"2,398",N/A,N/A,N/A,584,N/A
